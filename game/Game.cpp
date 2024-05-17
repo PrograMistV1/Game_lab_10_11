@@ -1,8 +1,8 @@
-#include "Game.h"
+#include "headers/Game.h"
 #include <filesystem>
 #include <iostream>
 
-#include "Menu.h"
+#include "headers/Menu.h"
 
 namespace fs = std::filesystem;
 

@@ -1,8 +1,8 @@
-#include "Menu.h"
+#include "headers/Menu.h"
 
 #include <unistd.h>
 
-#include "Console.h"
+#include "../Console.h"
 
 #ifdef _WIN32
 #include <conio.h>
