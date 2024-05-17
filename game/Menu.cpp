@@ -1,4 +1,7 @@
 #include "Menu.h"
+
+#include <unistd.h>
+
 #include "Console.h"
 
 #ifdef _WIN32
@@ -43,19 +46,29 @@ int Menu::getKey() {
     newt.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
+    int result = 0;
     char ch;
     if (read(STDIN_FILENO, &ch, 1) > 0) {
         if (ch == '\033') {
             if (read(STDIN_FILENO, &ch, 1) > 0 && ch == '[') {
                 if (read(STDIN_FILENO, &ch, 1) > 0) {
-                    return "\033[" + std::string(1, ch);
+                    if(ch == 'A') {
+                        result = UP_KEY;
+                    }else if(ch == 'B') {
+                        result = DOWN_KEY;
+                    }
                 }
             }
         }
     }
 
+    if(ch == '\n') {
+        result = ENTER_KEY;
+    } else if(result == 0) {
+        result = static_cast<unsigned char>(ch);
+    }
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    return std::basic_string(1, ch);
+    return result;
 #endif
 }
 
@@ -73,8 +86,7 @@ void Menu::show() {
             }
         }
 
-        const int key = getKey();
-        switch(key){
+        switch(getKey()){
             case UP_KEY:
                 if (this->selectedButton == 0) {
                     this->selectedButton = static_cast<int>(this->buttons.size()) - 1;
