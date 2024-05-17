@@ -9,12 +9,12 @@ namespace fs = std::filesystem;
 void Game::init() {
     auto menu = new Menu();
     menu->addButton({
-        "start", [menu] {
+        "start", [] {
             std::cout << "start pressed" << std::endl;
         }
     });
     menu->addButton({
-        "load", [menu] {
+        "load", [] {
             std::cout << "load pressed" << std::endl;
         }
     });

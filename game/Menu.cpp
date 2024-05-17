@@ -1,10 +1,14 @@
 #include "Menu.h"
+#include "Console.h"
 
-#include <termios.h>
 #include <thread>
 #include <unistd.h>
 
-#include "Console.h"
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <termios.h>
+#endif
 
 Menu::Menu() = default;
 
@@ -12,6 +16,14 @@ Menu::Menu(const std::vector<button> &buttons) : buttons(buttons) {
 }
 
 std::string Menu::getKey() {
+#ifdef _WIN32
+    for (char c = 8; c <= 222; c++) {
+        if (GetAsyncKeyState(c) & 0x8000) {
+            std::cout << c << endl;
+            return c;
+        }
+    }
+#else
     termios oldt{}, newt{};
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
@@ -32,6 +44,7 @@ std::string Menu::getKey() {
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     return std::basic_string(1, ch);
+#endif
 }
 
 void Menu::show() {
