@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+#define UP_KEY 1000
+#define DOWN_KEY 1001
+#define ENTER_KEY 1002
+
 struct button {
     std::string text;
     std::function<void()> pressFunc;
@@ -17,7 +21,7 @@ class Menu {
     std::vector<button> buttons;
     int selectedButton = 0;
 
-    static std::string getKey();
+    static int getKey();
 public:
     Menu();
     explicit Menu(const std::vector<button>& buttons);

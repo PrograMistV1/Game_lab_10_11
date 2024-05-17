@@ -1,11 +1,8 @@
 #include "Menu.h"
 #include "Console.h"
 
-#include <thread>
-#include <unistd.h>
-
 #ifdef _WIN32
-#include <windows.h>
+#include <conio.h>
 #else
 #include <termios.h>
 #endif
@@ -15,12 +12,27 @@ Menu::Menu() = default;
 Menu::Menu(const std::vector<button> &buttons) : buttons(buttons) {
 }
 
-std::string Menu::getKey() {
+int Menu::getKey() {
 #ifdef _WIN32
-    for (char c = 8; c <= 222; c++) {
-        if (GetAsyncKeyState(c) & 0x8000) {
-            std::cout << c << endl;
-            return c;
+    while (true) {
+        if (_kbhit()) {
+            int ch = _getch();
+            if (ch == 224) {
+                ch = _getch();
+                switch (ch) {
+                    case 72:
+                        return UP_KEY;
+                    case 80:
+                        return DOWN_KEY;
+                    default:
+                        return ch;
+                }
+            } else {
+                if(ch == 13){
+                    return ENTER_KEY;
+                }
+                return ch;
+            }
         }
     }
 #else
@@ -61,22 +73,27 @@ void Menu::show() {
             }
         }
 
-        const std::string key = getKey();
-        if (key == "\033[A") {
-            if (this->selectedButton == 0) {
-                this->selectedButton = static_cast<int>(this->buttons.size()) - 1;
-            } else {
-                this->selectedButton--;
-            }
-        } else if (key == "\033[B") {
-            if (this->selectedButton == static_cast<int>(this->buttons.size()) - 1) {
-                this->selectedButton = 0;
-            } else {
-                this->selectedButton++;
-            }
-        } else if (key == "\n") {
-            buttons[selectedButton].press();
-            exitMenu = true;
+        const int key = getKey();
+        switch(key){
+            case UP_KEY:
+                if (this->selectedButton == 0) {
+                    this->selectedButton = static_cast<int>(this->buttons.size()) - 1;
+                } else {
+                    this->selectedButton--;
+                }
+                break;
+            case DOWN_KEY:
+                if (this->selectedButton == static_cast<int>(this->buttons.size()) - 1) {
+                    this->selectedButton = 0;
+                } else {
+                    this->selectedButton++;
+                }
+                break;
+            case ENTER_KEY:
+                buttons[selectedButton].press();
+                exitMenu = true;
+                break;
+            default:;
         }
     } while (!exitMenu);
 }
