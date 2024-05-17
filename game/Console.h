@@ -19,6 +19,7 @@ inline std::map<std::string_view, Color> formatMap = {
     {"yellow", FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY}
 #else
     {"default", "0"},
+    {"black", "30"},
     {"red", "31"},
     {"green", "32"},
     {"yellow", "33"},

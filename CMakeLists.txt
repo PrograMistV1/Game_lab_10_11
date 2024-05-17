@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.27.8)
 project(Lab10_Gra_)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -13,4 +13,6 @@ add_executable(Lab10_Gra_ main.cpp
         game/Inventory.cpp
         game/Inventory.h
         game/Item.cpp
-        game/Item.h)
+        game/Item.h
+        game/Menu.cpp
+        game/Menu.h)

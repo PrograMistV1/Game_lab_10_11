@@ -6,7 +6,7 @@
 class Game {
     Player *player = nullptr;
 public:
-    void start();
+    void init();
     void load();
 };
 
