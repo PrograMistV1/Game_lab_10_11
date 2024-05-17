@@ -1,4 +1,4 @@
-#include "Inventory.h"
+#include "headers/Inventory.h"
 
 Inventory::Inventory(const int size) : size(size){
 }
