@@ -4,8 +4,6 @@
 #include <stack>
 #include <string>
 
-short selectedLine = 0;
-
 bool issetColor(const std::string_view &tag) {
     const auto it = formatMap.find(tag);
     return it != formatMap.end();
@@ -14,8 +12,23 @@ bool issetColor(const std::string_view &tag) {
 void setConsoleTextColor(const Color &color) {
 #ifdef _WIN32
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, color);
+    CONSOLE_SCREEN_BUFFER_INFO bufferInfo;
+    GetConsoleScreenBufferInfo(hConsole, &bufferInfo);
+    Color oldColor;
+    if (color == 0x1111) { //0x1111 means completely clear formatting
+        SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+        return;
+    }
+    //Checking which plan (foreground or background) the user is trying to change, and then resetting the old one
+    if(color & FOREGROUND_RED || color & FOREGROUND_GREEN || color & FOREGROUND_BLUE || color == 0){
+        oldColor = bufferInfo.wAttributes & ~(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+    } else {
+        oldColor = bufferInfo.wAttributes & ~(BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
+    }
+    //Setting a new color
+    SetConsoleTextAttribute(hConsole, oldColor | color);
 #else
+    //ESC symbol
     std::cout << "\033[" << color << "m";
 #endif
 }
