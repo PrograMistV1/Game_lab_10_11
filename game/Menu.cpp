@@ -52,9 +52,9 @@ int Menu::getKey() {
         if (ch == '\033') {
             if (read(STDIN_FILENO, &ch, 1) > 0 && ch == '[') {
                 if (read(STDIN_FILENO, &ch, 1) > 0) {
-                    if(ch == 'A') {
+                    if (ch == 'A') {
                         result = UP_KEY;
-                    }else if(ch == 'B') {
+                    } else if (ch == 'B') {
                         result = DOWN_KEY;
                     }
                 }
@@ -62,9 +62,9 @@ int Menu::getKey() {
         }
     }
 
-    if(ch == '\n') {
+    if (ch == '\n') {
         result = ENTER_KEY;
-    } else if(result == 0) {
+    } else if (result == 0) {
         result = static_cast<unsigned char>(ch);
     }
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
@@ -86,7 +86,7 @@ void Menu::show() {
             }
         }
 
-        switch(getKey()){
+        switch (getKey()) {
             case UP_KEY:
                 if (this->selectedButton == 0) {
                     this->selectedButton = static_cast<int>(this->buttons.size()) - 1;
@@ -105,7 +105,7 @@ void Menu::show() {
                 buttons[selectedButton].press();
                 exitMenu = true;
                 break;
-            default:;
+            default: ;
         }
     } while (!exitMenu);
 }
