@@ -3,17 +3,13 @@
 #include <unistd.h>
 
 #include "../Console.h"
+#include "headers/Player.h"
 
 #ifdef _WIN32
 #include <conio.h>
 #else
 #include <termios.h>
 #endif
-
-Menu::Menu() = default;
-
-Menu::Menu(const std::vector<button> &buttons) : buttons(buttons) {
-}
 
 int Menu::getKey() {
 #ifdef _WIN32
@@ -73,36 +69,42 @@ int Menu::getKey() {
 }
 
 void Menu::show() {
+    this->shown = true;
     bool exitMenu = false;
 
     do {
         clearConsole();
 
-        for (int i = 0; i < this->buttons.size(); i++) {
+        for (int i = 0; i < this->elenents.size(); i++) {
             if (i == this->selectedButton) {
-                printFormattedString("<bg_grey><black> " + buttons[i].text + " </black></bg_grey>");
-            } else {
-                printFormattedString(" " + this->buttons[i].text + " ");
+                if (!std::dynamic_pointer_cast<label>(this->elenents[this->selectedButton])) {
+                    printFormattedString("<bg_grey><black> " + elenents[i]->text + " </black></bg_grey>");
+                    continue;
+                }
+                this->selectedButton++;
             }
+            printFormattedString(" " + this->elenents[i]->text + " ");
         }
 
         switch (getKey()) {
             case UP_KEY:
                 if (this->selectedButton == 0) {
-                    this->selectedButton = static_cast<int>(this->buttons.size()) - 1;
+                    this->selectedButton = static_cast<int>(this->elenents.size()) - 1;
                 } else {
                     this->selectedButton--;
                 }
                 break;
             case DOWN_KEY:
-                if (this->selectedButton == static_cast<int>(this->buttons.size()) - 1) {
+                if (this->selectedButton == static_cast<int>(this->elenents.size()) - 1) {
                     this->selectedButton = 0;
                 } else {
                     this->selectedButton++;
                 }
                 break;
             case ENTER_KEY:
-                buttons[selectedButton].press();
+                if (const auto btnPtr = std::dynamic_pointer_cast<button>(this->elenents[this->selectedButton])) {
+                    btnPtr->press();
+                }
                 exitMenu = true;
                 break;
             default: ;
@@ -110,6 +112,25 @@ void Menu::show() {
     } while (!exitMenu);
 }
 
-void Menu::addButton(const button &button) {
-    this->buttons.push_back(button);
+void Menu::addContent(const std::shared_ptr<content> &element) {
+    if (!this->shown) {
+        this->elenents.push_back(element);
+    }
+}
+
+Menu* mainMenu(Player *player) {
+    const auto menu = new Menu();
+    menu->addContent(std::make_shared<button>(
+        "look for a room", [] {
+        }
+    ));
+    menu->addContent(std::make_shared<button>(
+        "restroom", [] {
+        }
+    ));
+    menu->addContent(std::make_shared<button>(
+        "inventory", [] {
+        }
+    ));
+    return menu;
 }

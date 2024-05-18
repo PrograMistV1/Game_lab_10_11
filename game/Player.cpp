@@ -3,3 +3,8 @@
 Inventory *Player::getInventory() const {
     return this->inventory;
 }
+
+void Player::save() {
+
+}
+

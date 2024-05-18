@@ -7,27 +7,43 @@
 namespace fs = std::filesystem;
 
 void Game::init() {
-    auto menu = new Menu();
-    menu->addButton({
-        "start", [] {
-            std::cout << "start pressed" << std::endl;
+    const auto menu = new Menu();
+    menu->addContent(std::make_shared<label>("game (lab 10-11)"));
+    menu->addContent(std::make_shared<button>(
+        "start", [this] {
+            this->start();
         }
-    });
-    menu->addButton({
+    ));
+    menu->addContent(std::make_shared<button>(
         "load", [] {
             std::cout << "load pressed" << std::endl;
         }
-    });
-    menu->addButton({
-        "exit", [] {
+    ));
+    menu->addContent(std::make_shared<button>(
+        "exit", [this] {
+            this->setMenu(nullptr);
             std::cout << "Closing the game..." << std::endl;
         }
-    });
-    menu->show();
+    ));
+    this->nextMenu = menu;
+
+    while (this->nextMenu != nullptr) {
+        this->nextMenu->show();
+    }
 }
 
+void Game::start() {
+    this->player = new Player();
+    this->setMenu(mainMenu(this->player));
+}
 
 void Game::load() {
     fs::create_directory("./saves");
     this->player = new Player;
 }
+
+void Game::setMenu(Menu *menu) {
+    delete this->nextMenu;
+    this->nextMenu = menu;
+}
+
