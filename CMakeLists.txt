@@ -15,4 +15,7 @@ add_executable(Game_lab_10_11 main.cpp
         game/Item.cpp
         game/headers/Item.h
         game/Menu.cpp
-        game/headers/Menu.h)
+        game/headers/Menu.h
+        game/headers/TreasureRoom.h
+        game/TreasureRoom.cpp
+)

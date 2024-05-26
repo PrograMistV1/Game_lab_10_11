@@ -1,31 +1,17 @@
 #include "headers/Game.h"
 #include <filesystem>
-#include <iostream>
 
 #include "headers/Menu.h"
 
 namespace fs = std::filesystem;
 
+void registerItems(ItemFactory *factory);
+
 void Game::init() {
-    const auto menu = new Menu();
-    menu->addContent(std::make_shared<label>("game (lab 10-11)"));
-    menu->addContent(std::make_shared<button>(
-        "start", [this] {
-            this->start();
-        }
-    ));
-    menu->addContent(std::make_shared<button>(
-        "load", [] {
-            std::cout << "load pressed" << std::endl;
-        }
-    ));
-    menu->addContent(std::make_shared<button>(
-        "exit", [this] {
-            this->setMenu(nullptr);
-            std::cout << "Closing the game..." << std::endl;
-        }
-    ));
-    this->nextMenu = menu;
+    factory = new ItemFactory();
+    registerItems(this->factory);
+
+    this->setMenu(startScreen(this));
 
     while (this->nextMenu != nullptr) {
         this->nextMenu->show();
@@ -34,7 +20,7 @@ void Game::init() {
 
 void Game::start() {
     this->player = new Player();
-    this->setMenu(mainMenu(this->player));
+    this->setMenu(mainMenu(this));
 }
 
 void Game::load() {
@@ -42,8 +28,20 @@ void Game::load() {
     this->player = new Player;
 }
 
+ItemFactory *Game::getItemFactory() const {
+    return factory;
+}
+
+
+Player *Game::getPlayer() const {
+    return this->player;
+}
+
 void Game::setMenu(Menu *menu) {
     delete this->nextMenu;
     this->nextMenu = menu;
 }
 
+void registerItems(ItemFactory *factory) {
+    factory->registerDefaultItem(new Gold());
+}

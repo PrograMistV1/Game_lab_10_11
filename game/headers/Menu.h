@@ -1,15 +1,9 @@
 #ifndef MENU_H
 #define MENU_H
-#include "Player.h"
+
 #include <functional>
-#include <memory>
 #include <string>
 #include <utility>
-#include <vector>
-
-#define UP_KEY 1000
-#define DOWN_KEY 1001
-#define ENTER_KEY 1002
 
 struct content {
     std::string text;
@@ -43,8 +37,18 @@ struct button final : content {
     }
 };
 
+#include <vector>
+
+#include "Game.h"
+
+#define UP_KEY 1000
+#define DOWN_KEY 1001
+#define ENTER_KEY 1002
+
+class Game;
+
 class Menu {
-    std::vector<std::shared_ptr<content>> elenents;
+    std::vector<content *> elenents;
     int selectedButton = 0;
 
     bool shown = false;
@@ -52,11 +56,15 @@ class Menu {
     static int getKey();
 
 public:
-    void addContent(const std::shared_ptr<content> &element);
+    void addContent(content *element);
 
     void show();
 };
 
-Menu* mainMenu(Player *player);
+Menu *startScreen(Game *game);
+
+Menu *mainMenu(Game *game);
+
+Menu *lookForRoom(Game *game);
 
 #endif

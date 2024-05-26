@@ -3,7 +3,9 @@
 #include <unistd.h>
 
 #include "../Console.h"
+#include "headers/Game.h"
 #include "headers/Player.h"
+#include "headers/TreasureRoom.h"
 
 #ifdef _WIN32
 #include <conio.h>
@@ -77,7 +79,7 @@ void Menu::show() {
 
         for (int i = 0; i < this->elenents.size(); i++) {
             if (i == this->selectedButton) {
-                if (!std::dynamic_pointer_cast<label>(this->elenents[this->selectedButton])) {
+                if (typeid(*this->elenents[this->selectedButton]) != typeid(label)) {
                     printFormattedString("<bg_grey><black> " + elenents[i]->text + " </black></bg_grey>");
                     continue;
                 }
@@ -102,8 +104,8 @@ void Menu::show() {
                 }
                 break;
             case ENTER_KEY:
-                if (const auto btnPtr = std::dynamic_pointer_cast<button>(this->elenents[this->selectedButton])) {
-                    btnPtr->press();
+                if (typeid(*this->elenents[this->selectedButton]) == typeid(button)) {
+                    static_cast<button *>(this->elenents[this->selectedButton])->press();
                 }
                 exitMenu = true;
                 break;
@@ -112,25 +114,114 @@ void Menu::show() {
     } while (!exitMenu);
 }
 
-void Menu::addContent(const std::shared_ptr<content> &element) {
+void Menu::addContent(content *element) {
     if (!this->shown) {
         this->elenents.push_back(element);
     }
 }
 
-Menu* mainMenu(Player *player) {
+Menu *startScreen(Game *game) {
     const auto menu = new Menu();
-    menu->addContent(std::make_shared<button>(
-        "look for a room", [] {
+    menu->addContent(new label{"game (lab 10-11)"});
+    menu->addContent(new button{
+        "start", [game] {
+            game->start();
         }
-    ));
-    menu->addContent(std::make_shared<button>(
-        "restroom", [] {
+    });
+    menu->addContent(new button{
+        "load", [] {
+            std::cout << "load pressed" << std::endl;
         }
-    ));
-    menu->addContent(std::make_shared<button>(
+    });
+    menu->addContent(new button{
+        "exit", [game] {
+            game->setMenu(nullptr);
+            std::cout << "Closing the game..." << std::endl;
+        }
+    });
+    return menu;
+}
+
+Menu *mainMenu(Game *game) {
+    Player *player = game->getPlayer();
+    const auto menu = new Menu();
+    menu->addContent(new label{
+        "health: " + std::to_string(player->getHealth()) + "  energy: " + std::to_string(player->getEnergy())
+    });
+    menu->addContent(new button{
+        "look for a room", [game] {
+            game->setMenu(lookForRoom(game));
+        }
+    });
+    menu->addContent(new button{
+        "restroom", [game, player] {
+            player->setEnergy(player->getMaxEnergy());
+            player->setHealth(player->getMaxHealth());
+            const auto restroomMenu = new Menu();
+            restroomMenu->addContent(new label{
+                "energy and health restored"
+            });
+            restroomMenu->addContent(new button{
+                "back", [game] {
+                    game->setMenu(mainMenu(game));
+                }
+            });
+            game->setMenu(restroomMenu);
+        }
+    });
+    menu->addContent(new button{
         "inventory", [] {
         }
-    ));
+    });
+    return menu;
+}
+
+Menu *lookForRoom(Game *game) {
+    Player *player = game->getPlayer();
+    player->setEnergy(player->getEnergy() - 5);
+    const auto menu = new Menu();
+    const int randInt = rand() % 100;
+    if (randInt < 45) {
+        //45%
+        menu->addContent(new label{
+            "you found the treasure room"
+        });
+        menu->addContent(new button{
+            "войти", [game] {
+                treasure_room *treasure_room = new ordinary_room();
+                treasure_room->getChest(game)->show(game);
+            }
+        });
+    } else if (randInt < 70) {
+        //25%
+        const int damage = rand() % 7 + 1;
+        menu->addContent(new label{
+            "you were attacked by a monster"
+        });
+        menu->addContent(new label{
+            "damage received: <red>" + std::to_string(damage) + "</red>"
+        });
+        player->setHealth(player->getHealth() - damage);
+
+        if (player->getHealth() <= 0) {
+            menu->addContent(new button{
+                "<red>game over</red>", [game] {
+                    game->setMenu(startScreen(game));
+                }
+            });
+            return menu;
+        }
+    } else {
+        //30%
+        menu->addContent(new label{
+            "you didn't find anything"
+        });
+    }
+    menu->addContent(new button{
+        "back", [game] {
+            game->setMenu(mainMenu(game));
+        }
+    });
+
     return menu;
 }
