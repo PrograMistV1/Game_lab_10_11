@@ -27,13 +27,15 @@ public:
 
     virtual Item *clone() const = 0;
 
-    virtual void use(Player *player) const = 0;
+    virtual void use(Game* game, int slot, button* backButton) const = 0;
 
     virtual std::string getDisplayName() const = 0;
 
+    virtual std::string getInfo() const = 0;
+
     virtual ~Item() = default;
 
-    Menu *pickUpMenu(Inventory *inventory, int index, Game *game);
+    Menu *pickUpMenu(Inventory *from, Inventory *to, int index, Game *game);
 };
 
 class ItemFactory {
@@ -42,13 +44,14 @@ class ItemFactory {
 
 public:
     void registerDefaultItem(const Item *item);
+    void registerRareItem(const Item *item);
 
     std::map<std::string, Item *> getDefaultItems();
 
     std::map<std::string, Item *> getRareItems();
 };
 
-class Gold : public Item {
+class Gold final : public Item {
 public:
     Gold() = default;
 
@@ -58,9 +61,61 @@ public:
 
     Item *clone() const override;
 
-    void use(Player *player) const override;
+    void use(Game* game, int slot, button* backButton) const override;
 
     std::string getDisplayName() const override;
+
+    std::string getInfo() const override;
 };
 
+class Bread final : public Item {
+public:
+    Bread() = default;
+
+    explicit Bread(const Bread *bread);
+
+    std::string getId() const override;
+
+    Item *clone() const override;
+
+    void use(Game* game, int slot, button* backButton) const override;
+
+    std::string getDisplayName() const override;
+
+    std::string getInfo() const override;
+};
+
+class Rock final : public Item {
+public:
+    Rock() = default;
+
+    explicit Rock(const Rock *rock);
+
+    std::string getId() const override;
+
+    Item *clone() const override;
+
+    void use(Game* game, int slot, button* backButton) const override;
+
+    std::string getDisplayName() const override;
+
+    std::string getInfo() const override;
+};
+
+class HealthPotion final : public Item {
+public:
+    HealthPotion() = default;
+
+    explicit HealthPotion(const HealthPotion *healtPotion);
+
+    std::string getId() const override;
+
+    Item *clone() const override;
+
+    void use(Game* game, int slot, button* backButton) const override;
+
+    std::string getDisplayName() const override;
+
+    std::string getInfo() const override;
+};
 #endif

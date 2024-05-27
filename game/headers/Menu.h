@@ -32,6 +32,10 @@ struct button final : content {
         : content(text), pressFunc(std::move(func)) {
     }
 
+    button* clone() const {
+        return new button(text, pressFunc);
+    }
+
     void press() const {
         this->pressFunc();
     }
@@ -59,6 +63,8 @@ public:
     void addContent(content *element);
 
     void show();
+
+    ~Menu();
 };
 
 Menu *startScreen(Game *game);

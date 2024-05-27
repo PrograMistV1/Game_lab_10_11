@@ -11,11 +11,12 @@ class Game;
 class Menu;
 
 class Inventory {
-    int size = 0;
+    int size;
+    std::string title;
     std::map<const int, Item *> items;
 
 public:
-    explicit Inventory(int size);
+    explicit Inventory(int size, const std::string &title);
 
     void setSize(int size);
 
@@ -25,6 +26,13 @@ public:
 
     [[nodiscard]] Item *getItem(int index) const;
 
-    void show(Game *game);
+    virtual void show(Game *game);
+    virtual void show(Game *game, button *backButton);
+
+    virtual std::string getTitle() const;
+
+    void showItemMenu(Game *game, int index, button* backButton);
+
+    virtual ~Inventory() = default;
 };
 #endif

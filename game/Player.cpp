@@ -1,15 +1,12 @@
 #include "headers/Player.h"
 
 Player::Player() {
-    this->inventory = new Inventory(5);
+    this->inventory = new Inventory(3, "<blue>Player Inventory</blue>");
 }
 
 
 Inventory *Player::getInventory() const {
     return this->inventory;
-}
-
-void Player::save() {
 }
 
 int Player::getHealth() const {

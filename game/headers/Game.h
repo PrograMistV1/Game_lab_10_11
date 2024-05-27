@@ -10,16 +10,12 @@ class ItemFactory;
 class Game {
     Player *player = nullptr;
 
-    Menu *nextMenu = nullptr;
+    Menu *currentMenu = nullptr;
 
     ItemFactory *factory = nullptr;
 
 public:
     void init();
-
-    void start();
-
-    void load();
 
     ItemFactory *getItemFactory() const;
 

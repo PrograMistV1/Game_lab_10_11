@@ -90,11 +90,13 @@ void Menu::show() {
 
         switch (getKey()) {
             case UP_KEY:
-                if (this->selectedButton == 0) {
-                    this->selectedButton = static_cast<int>(this->elenents.size()) - 1;
-                } else {
-                    this->selectedButton--;
-                }
+                do {
+                    if (this->selectedButton == 0) {
+                        this->selectedButton = static_cast<int>(this->elenents.size()) - 1;
+                    } else {
+                        this->selectedButton--;
+                    }
+                } while (typeid(*this->elenents[this->selectedButton]) == typeid(label));
                 break;
             case DOWN_KEY:
                 if (this->selectedButton == static_cast<int>(this->elenents.size()) - 1) {
@@ -120,39 +122,23 @@ void Menu::addContent(content *element) {
     }
 }
 
-Menu *startScreen(Game *game) {
-    const auto menu = new Menu();
-    menu->addContent(new label{"game (lab 10-11)"});
-    menu->addContent(new button{
-        "start", [game] {
-            game->start();
-        }
-    });
-    menu->addContent(new button{
-        "load", [] {
-            std::cout << "load pressed" << std::endl;
-        }
-    });
-    menu->addContent(new button{
-        "exit", [game] {
-            game->setMenu(nullptr);
-            std::cout << "Closing the game..." << std::endl;
-        }
-    });
-    return menu;
-}
-
 Menu *mainMenu(Game *game) {
     Player *player = game->getPlayer();
     const auto menu = new Menu();
     menu->addContent(new label{
         "health: " + std::to_string(player->getHealth()) + "  energy: " + std::to_string(player->getEnergy())
     });
-    menu->addContent(new button{
-        "look for a room", [game] {
-            game->setMenu(lookForRoom(game));
-        }
-    });
+    if (player->getEnergy() <= 0) {
+        menu->addContent(new label{
+            "<bg_red>look for a room</bg_red>"
+        });
+    } else {
+        menu->addContent(new button{
+            "look for a room", [game] {
+                game->setMenu(lookForRoom(game));
+            }
+        });
+    }
     menu->addContent(new button{
         "restroom", [game, player] {
             player->setEnergy(player->getMaxEnergy());
@@ -170,7 +156,14 @@ Menu *mainMenu(Game *game) {
         }
     });
     menu->addContent(new button{
-        "inventory", [] {
+        "inventory", [game] {
+            game->getPlayer()->getInventory()->show(game);
+        }
+    });
+    menu->addContent(new button{
+        "exit", [game] {
+            game->setMenu(nullptr);
+            std::cout << "Closing the game..." << std::endl;
         }
     });
     return menu;
@@ -187,9 +180,16 @@ Menu *lookForRoom(Game *game) {
             "you found the treasure room"
         });
         menu->addContent(new button{
-            "войти", [game] {
-                treasure_room *treasure_room = new ordinary_room();
-                treasure_room->getChest(game)->show(game);
+            "come in", [game] {
+                const TreasureRoom *treasureRoom;
+                if (rand() % 100 < 70) {
+                    //70%
+                    treasureRoom = new OrdinaryRoom();
+                } else {
+                    //30%
+                    treasureRoom = new RareRoom();
+                }
+                treasureRoom->getChest(game)->show(game);
             }
         });
     } else if (randInt < 70) {
@@ -206,7 +206,7 @@ Menu *lookForRoom(Game *game) {
         if (player->getHealth() <= 0) {
             menu->addContent(new button{
                 "<red>game over</red>", [game] {
-                    game->setMenu(startScreen(game));
+                    game->setMenu(nullptr);
                 }
             });
             return menu;
@@ -224,4 +224,10 @@ Menu *lookForRoom(Game *game) {
     });
 
     return menu;
+}
+
+Menu::~Menu() {
+    for (int i = 0; i < this->elenents.size(); i++) {
+        delete this->elenents[i];
+    }
 }

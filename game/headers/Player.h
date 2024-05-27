@@ -18,8 +18,6 @@ public:
 
     [[nodiscard]] Inventory *getInventory() const;
 
-    void save();
-
     [[nodiscard]] int getHealth() const;
 
     [[nodiscard]] int getMaxHealth() const;
