@@ -1,7 +1,5 @@
 #include "headers/Menu.h"
 
-#include <unistd.h>
-
 #include "../Console.h"
 #include "headers/Game.h"
 #include "headers/Player.h"
@@ -10,6 +8,7 @@
 #ifdef _WIN32
 #include <conio.h>
 #else
+#include <unistd.h>
 #include <termios.h>
 #endif
 
