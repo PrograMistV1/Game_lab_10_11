@@ -31,29 +31,23 @@ Chest::Chest(const int size, const std::string &title) : Inventory(size, title) 
 }
 
 void Chest::show(Game *game) {
-    const auto backButton = new button{
-        "back", [game] {
-            game->setMenu(mainMenu(game));
-        }
+    const std::function backButtonFunc = [game] {
+        game->setMenu(mainMenu(game));
     };
-    this->show(game, backButton);
+    this->show(game, backButtonFunc);
 }
 
-void Chest::show(Game *game, button *backButton) {
+void Chest::show(Game *game, std::function<void()> backButtonFunc) {
     const auto menu = new Menu();
     menu->addContent(new label{this->getTitle()});
-    menu->addContent(backButton->clone());
+    menu->addContent(new button{"close", backButtonFunc});
 
     menu->addContent(new button{
-        "player inventory", [game, backButton, this] {
-            game->getPlayer()->getInventory()->show(
-                game,
-                new button{
-                    "back", [this, game, backButton] {
-                        this->show(game, backButton->clone());
-                    }
-                }
-            );
+        "player inventory", [game, backButtonFunc, this] {
+            std::function func = [this, game, backButtonFunc] {
+                this->show(game, backButtonFunc);
+            };
+            game->getPlayer()->getInventory()->show(game, func);
         }
     });
 

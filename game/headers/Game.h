@@ -15,12 +15,19 @@ class Game {
     ItemFactory *factory = nullptr;
 
 public:
+    /**
+     * Initializes and starts the game
+     */
     void init();
 
     ItemFactory *getItemFactory() const;
 
     Player *getPlayer() const;
 
+    /**
+     * Installs a new menu and deletes the previous menu object.
+     * @param menu 
+     */
     void setMenu(Menu *menu);
 };
 

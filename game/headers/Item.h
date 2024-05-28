@@ -27,7 +27,7 @@ public:
 
     virtual Item *clone() const = 0;
 
-    virtual void use(Game* game, int slot, button* backButton) const = 0;
+    virtual void use(Game *game, int slot, button *backButton) const = 0;
 
     virtual std::string getDisplayName() const = 0;
 
@@ -44,6 +44,7 @@ class ItemFactory {
 
 public:
     void registerDefaultItem(const Item *item);
+
     void registerRareItem(const Item *item);
 
     std::map<std::string, Item *> getDefaultItems();
@@ -61,7 +62,7 @@ public:
 
     Item *clone() const override;
 
-    void use(Game* game, int slot, button* backButton) const override;
+    void use(Game *game, int slot, button *backButton) const override;
 
     std::string getDisplayName() const override;
 
@@ -78,7 +79,7 @@ public:
 
     Item *clone() const override;
 
-    void use(Game* game, int slot, button* backButton) const override;
+    void use(Game *game, int slot, button *backButton) const override;
 
     std::string getDisplayName() const override;
 
@@ -95,7 +96,7 @@ public:
 
     Item *clone() const override;
 
-    void use(Game* game, int slot, button* backButton) const override;
+    void use(Game *game, int slot, button *backButton) const override;
 
     std::string getDisplayName() const override;
 
@@ -112,7 +113,7 @@ public:
 
     Item *clone() const override;
 
-    void use(Game* game, int slot, button* backButton) const override;
+    void use(Game *game, int slot, button *backButton) const override;
 
     std::string getDisplayName() const override;
 

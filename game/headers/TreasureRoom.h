@@ -28,7 +28,7 @@ public:
 
     void show(Game *game) override;
 
-    void show(Game *game, button *backButton) override;
+    void show(Game *game, std::function<void()> backButtonFunc) override;
 };
 
 #endif

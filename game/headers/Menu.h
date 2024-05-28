@@ -8,17 +8,13 @@
 struct content {
     std::string text;
 
-    content() = default;
-
-    explicit content(std::string text) : text(std::move(text)) {
+    explicit content(const std::string &text) : text(std::move(text)) {
     }
 
     virtual ~content() = default;
 };
 
 struct label final : content {
-    label() = default;
-
     explicit label(const std::string &text): content(text) {
     }
 };
@@ -26,13 +22,11 @@ struct label final : content {
 struct button final : content {
     std::function<void()> pressFunc;
 
-    button() = default;
-
     button(const std::string &text, std::function<void()> func)
         : content(text), pressFunc(std::move(func)) {
     }
 
-    button* clone() const {
+    button *clone() const {
         return new button(text, pressFunc);
     }
 
@@ -60,6 +54,10 @@ class Menu {
     static int getKey();
 
 public:
+    /**
+     * Displays a menu in the console.
+     * @param element
+     */
     void addContent(content *element);
 
     void show();
@@ -67,10 +65,18 @@ public:
     ~Menu();
 };
 
-Menu *startScreen(Game *game);
-
+/**
+ * Creates the main menu of the game.
+ * @param game
+ * @return
+ */
 Menu *mainMenu(Game *game);
 
+/**
+ * Creates a room search menu.
+ * @param game
+ * @return
+ */
 Menu *lookForRoom(Game *game);
 
 #endif

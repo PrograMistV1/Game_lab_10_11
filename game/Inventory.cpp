@@ -1,6 +1,6 @@
 #include "headers/Inventory.h"
 
-Inventory::Inventory(const int size, const std::string &title) : size(size) , title(title){
+Inventory::Inventory(const int size, const std::string &title) : size(size), title(title) {
 }
 
 void Inventory::setSize(const int size) {
@@ -32,26 +32,24 @@ Item *Inventory::getItem(const int index) const {
 }
 
 void Inventory::show(Game *game) {
-    const auto backButton = new button{
-        "back", [game] {
-            game->setMenu(mainMenu(game));
-        }
+    const std::function backButtonFunc = [game] {
+        game->setMenu(mainMenu(game));
     };
-    this->show(game, backButton);
+    this->show(game, backButtonFunc);
 }
 
 
-void Inventory::show(Game *game, button *backButton) {
+void Inventory::show(Game *game, std::function<void()> backButtonFunc) {
     const auto menu = new Menu();
     menu->addContent(new label{this->getTitle()});
-    menu->addContent(backButton);
+    menu->addContent(new button{"close", backButtonFunc});
 
     for (int index = 0; index < this->getSize(); index++) {
         Item *item = this->getItem(index);
         if (item != nullptr) {
             menu->addContent(new button{
-                std::to_string(index + 1) + ": " + item->getDisplayName(), [game, index, this, backButton] {
-                    this->showItemMenu(game, index, backButton->clone());
+                std::to_string(index + 1) + ": " + item->getDisplayName(), [game, index, this, backButtonFunc] {
+                    this->showItemMenu(game, index, backButtonFunc);
                 }
             });
         } else {
@@ -68,36 +66,36 @@ std::string Inventory::getTitle() const {
     return this->title;
 }
 
-void Inventory::showItemMenu(Game *game, const int index, button *backButton) {
+void Inventory::showItemMenu(Game *game, const int index, std::function<void()> backButtonFunc) {
     const auto menu = new Menu();
     Item *item = this->getItem(index);
     menu->addContent(new label{item->getInfo()});
     menu->addContent(new button{
-        "use", [game, index, item, this, backButton] {
+        "use", [game, index, item, this, backButtonFunc] {
             item->use(game, index, new button{
-                          "back", [this, game, backButton] {
-                              this->show(game, backButton);
+                          "back", [this, game, backButtonFunc] {
+                              this->show(game, backButtonFunc);
                           }
                       });
         }
     });
     menu->addContent(new button{
-        "replace", [game, this, backButton, index] {
+        "replace", [game, this, backButtonFunc, index] {
             const auto replaceMenu = new Menu();
             replaceMenu->addContent(new button{
-                "cancel", [game, this, backButton] {
-                    this->show(game, backButton);
+                "cancel", [game, this, backButtonFunc] {
+                    this->show(game, backButtonFunc);
                 }
             });
             for (int indexTo = 0; indexTo < this->getSize(); indexTo++) {
                 const Item *item = this->getItem(indexTo);
 
-                const std::function replaceFunc = [this, indexTo, index, game, backButton] {
+                const std::function replaceFunc = [this, indexTo, index, game, backButtonFunc] {
                     const Item *itemFrom = this->getItem(indexTo);
                     const Item *itemTo = this->getItem(index);
                     this->setItem(indexTo, itemTo);
                     this->setItem(index, itemFrom);
-                    this->show(game, backButton);
+                    this->show(game, backButtonFunc);
                 };
 
                 if (item != nullptr) {
@@ -120,14 +118,14 @@ void Inventory::showItemMenu(Game *game, const int index, button *backButton) {
         }
     });
     menu->addContent(new button{
-        "throw away", [this, game, backButton, index] {
+        "throw away", [this, game, backButtonFunc, index] {
             this->setItem(index, nullptr);
-            this->show(game, backButton);
+            this->show(game, backButtonFunc);
         }
     });
     menu->addContent(new button{
-        "back", [this, game, backButton] {
-            this->show(game, backButton);
+        "back", [this, game, backButtonFunc] {
+            this->show(game, backButtonFunc);
         }
     });
     game->setMenu(menu);
