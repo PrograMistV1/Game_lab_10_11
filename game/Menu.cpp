@@ -139,7 +139,7 @@ Menu *mainMenu(Game *game) {
         });
     }
     menu->addContent(new button{
-        "restroom", [game, player] {
+        "rest", [game, player] {
             player->setEnergy(player->getMaxEnergy());
             player->setHealth(player->getMaxHealth());
             const auto restroomMenu = new Menu();
